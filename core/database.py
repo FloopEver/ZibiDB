@@ -4,6 +4,7 @@ import shutil
 from ZibiDB.core.table import Table
 import pickle
 import sys
+import pandas as pd
 
 class Database():
     def __init__(self, name):
@@ -45,25 +46,6 @@ class Database():
         else:
             raise Exception('ERROR: Invalid command.')
 
-    # Load an exsiting database
-    def load(self):
-        database = self.name.replace(';', '').lower()
-        _database = sys.argv[0]      
-        _database = _database[:-11] + 'database/'
-
-        if not os.path.exists(_database + database):
-            raise Exception('ERROR: Database %s doesnt exist.' % database)
-
-        elif os.path.exists(_database + database):
-            file = open(_database + database, "rb")
-            self = pickle.load(file)
-            file.close()
-            print('You are now using Database: %s !' % database)
-            return
-
-        else:
-            raise Exception('ERROR: Invalid command.')
-
     def drop_database(self):
         database = self.name.replace(';', '').lower()
         _database = sys.argv[0]      
@@ -86,8 +68,8 @@ class Database():
             raise Exception('ERROR: Invalid command.')
 
     # Add new table to dabase
-    def add_table(self, info):
-        self.tables[info['name']] = Table(info)
+    def add_table(self, attrls, info):
+        self.tables[info['name']] = Table(attrls, info)
 
     # Drop exit table from database
     def drop_table(self, name):
@@ -95,5 +77,18 @@ class Database():
             raise Exception("Table %s doesn't exist" % name)
         del self.tables[name]
         print ('Table %s is dropped' % name)
+
+    def join_table(self, df1, df2, attrs):
+        info = {'name': '', 'attrs': [], 'primary': '', 'foreign': []}
+        if attrs:
+            df = pd.merge(df1, df2, left_on=attrs[0], right_on=attrs[1])
+        else:
+            df = df1.assign(key=1).merge(df2.assign(key=1), on='key').drop('key', 1)
+        return df
+
+    def df_and(self, df1, df2):
+        return pd.concat([df1, df2], axis=1, join='inner')
+    def df_or(self, df1, df2):
+        return pd.concat([df1, df2], axis=1, join='outer')
 
     

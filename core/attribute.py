@@ -15,7 +15,6 @@ class Attribute:
         TODO:
         -Check type by self.type
         -Check  notnull by self.notnull
-        -Check unique by self.unique
         -Use constraincheck to check constrain 
         -Please manage check order wisely
         -Raise error for invalid information
@@ -24,33 +23,27 @@ class Attribute:
             if value==None:
                 raise Exception('ERROR: The value must be not null.')
 
-        if self.type=='CAHR':
+        if self.type=='CHAR':
             if type(value)!=type('1'):
-                raise Exception('ERROR: Invalid type.')
+                raise Exception('ERROR 1: Invalid type.')
         elif self.type=='INT':
             if type(value)!=type(1):
-                raise Exception('ERROR: Invalid type.')
+                raise Exception('ERROR 2: Invalid type.')
         elif self.type=='FLOAT':
             if type(value)!=type(1.0):
-                raise Exception('ERROR: Invalid type.')
+                raise Exception('ERROR 3: Invalid type.')
         else:
-            raise Exception('ERROR: Invalid type.')
+            raise Exception('ERROR 4: Invalid type.')
+        # if self.constraincheck(value)==False:
 
-        if self.constraincheck(value)==False:
-            raise Exception('ERROR: The value do not satisfied to the constrain.')
-
-        # TODO: Check unique
-        if self.unique:
-            return 'UNIQUE'
-
+        #if self.constraincheck(value)==False:
+            #raise Exception('ERROR 5: The value do not satisfied to the constrain.')
         return True
-
-
         
     def constraincheck(self, value):
         # constrain = [T/F, None/value, T/F, None/value]
         # True: >=, False >
-        if self.type == 'CHAR' or self.constrain is None:
+        if self.type == 'CHAR' or self.constrain is []:
             return True
         return self.con1(value) and self.con2(value)
         
